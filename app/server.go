@@ -103,7 +103,7 @@ func HandleFileRequest(request *Request) *Response {
 			return response
 		}
 		defer f.Close()
-		f.Write(request.Body)
+		_, err = f.WriteString(string(request.Body))
 		if err != nil {
 			response.Status = "500 Internal Server Error"
 			return response
