@@ -53,35 +53,27 @@ func (response *Response) Serialize() []byte {
 
 func HandleRequest(request *Request) *Response {
 	response := new(Response)
-	if request.URL == "/" {
+	response.Header = make(map[string]string)
+	switch url := request.URL; {
+	case url == "/":
 		response.Status = "200 OK"
-		response.Header = make(map[string]string)
 		return response
-	}
-	if strings.HasPrefix(request.URL, "/echo") {
+	case strings.HasPrefix(url, "/echo/"):
 		response.Status = "200 OK"
-		str := strings.Split(request.URL, "/echo")
-		if str == nil {
-			response.Body = []byte("")
-		} else {
-			response.Body = []byte(strings.Trim(str[1], "/"))
-		}
-		response.Header = make(map[string]string)
+		response.Body = []byte(strings.TrimLeft(request.URL, "/echo/"))
 		response.Header["Content-Type"] = "text/plain"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(response.Body))
 		return response
-	}
-	if request.URL == "/user-agent" {
+	case url == "/user-agent":
 		response.Status = "200 OK"
 		response.Body = []byte(request.Header["User-Agent"])
-		response.Header = make(map[string]string)
 		response.Header["Content-Type"] = "text/plain"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(response.Body))
 		return response
+	default:
+		response.Status = "404 Not Found"
+		return response
 	}
-	response.Status = "404 Not Found"
-	response.Header = make(map[string]string)
-	return response
 }
 
 // Create a function to handle the connection
@@ -114,6 +106,6 @@ func main() {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	HandleConnection(conn)
+	go HandleConnection(conn)
 	conn.Close()
 }
