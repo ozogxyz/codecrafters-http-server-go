@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"net"
 	"os"
@@ -104,9 +103,7 @@ func HandleFileRequest(request *Request) *Response {
 			return response
 		}
 		defer f.Close()
-		writer := bufio.NewWriter(f)
-		_, err = writer.Write(request.Body)
-		writer.Flush()
+		f.Write(request.Body)
 		if err != nil {
 			response.Status = "500 Internal Server Error"
 			return response
