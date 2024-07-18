@@ -97,19 +97,13 @@ func HandleFileRequest(request *Request) *Response {
 		response.Header["Content-Type"] = "application/octet-stream"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(data))
 	} else if request.Method == "POST" {
-		f, err := os.OpenFile(filepath.Join(dir, filename), os.O_CREATE|os.O_WRONLY, 0644)
-		if err != nil {
-			response.Status = "500 Internal Server Error"
-			return response
-		}
-		defer f.Close()
-		_, err = f.WriteString(string(request.Body))
+		fileBody := []byte(strings.Trim(string(request.Body), "\x00"))
+		err := os.WriteFile(filepath.Join(dir, filename), fileBody, 0644)
 		if err != nil {
 			response.Status = "500 Internal Server Error"
 			return response
 		}
 		response.Status = "201 Created"
-		fmt.Println("Created file", filename)
 	}
 	return response
 }
