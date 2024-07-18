@@ -64,7 +64,7 @@ func HandleRequest(request *Request) *Response {
 		if str == nil {
 			response.Body = []byte("")
 		} else {
-			response.Body = []byte(str[1])
+			response.Body = []byte(strings.Trim(str[1], "/"))
 		}
 		response.Header = make(map[string]string)
 		response.Header["Content-Type"] = "text/plain"
