@@ -73,6 +73,7 @@ func HandleRequest(request *Request) *Response {
 		return response
 	case strings.HasPrefix(url, "/files/"):
 		response = HandleFileRequest(request)
+		fmt.Println(response)
 		return response
 	default:
 		response.Status = "404 Not Found"
@@ -103,8 +104,6 @@ func HandleFileRequest(request *Request) *Response {
 		}
 		response.Status = "201 Created"
 		fmt.Println("Created file", filename)
-		response.Header["Content-Type"] = "application/octet-stream"
-		response.Header["Content-Length"] = fmt.Sprintf("%d", len(request.Body))
 	}
 	return response
 }
