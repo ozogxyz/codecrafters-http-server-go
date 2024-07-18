@@ -106,6 +106,7 @@ func HandleFileRequest(request *Request) *Response {
 		defer f.Close()
 		writer := bufio.NewWriter(f)
 		_, err = writer.Write(request.Body)
+		writer.Flush()
 		if err != nil {
 			response.Status = "500 Internal Server Error"
 			return response
