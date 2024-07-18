@@ -60,7 +60,7 @@ func HandleRequest(request *Request) *Response {
 		return response
 	case strings.HasPrefix(url, "/echo/"):
 		response.Status = "200 OK"
-		response.Body = []byte(strings.TrimLeft(request.URL, "/echo/"))
+		response.Body = []byte(strings.TrimLeft(url, "/echo/"))
 		response.Header["Content-Type"] = "text/plain"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(response.Body))
 		return response
@@ -69,6 +69,19 @@ func HandleRequest(request *Request) *Response {
 		response.Body = []byte(request.Header["User-Agent"])
 		response.Header["Content-Type"] = "text/plain"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(response.Body))
+		return response
+	case strings.HasPrefix(url, "/files/"):
+		filename := strings.Split(url, "/files/")[1]
+		data, err := os.ReadFile("/tmp/" + filename)
+		if err != nil {
+			fmt.Println("Error reading file", err.Error())
+			response.Status = "404 Not Found"
+			return response
+		}
+		response.Status = "200 OK"
+		response.Body = data
+		response.Header["Content-Type"] = "application/octet-stream"
+		response.Header["Content-Length"] = fmt.Sprintf("%d", len(data))
 		return response
 	default:
 		response.Status = "404 Not Found"
