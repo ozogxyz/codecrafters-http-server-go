@@ -30,7 +30,7 @@ func handleConnection(conn net.Conn) {
 	}
 
 	if url[:5] == "/echo" {
-		str := strings.Split(url, "/echo")[1]
+		str := strings.Split(url, "/echo/")[1]
 		response := fmt.Sprintf("%sContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", OK, len(str), str)
 		conn.Write([]byte(response))
 		return
