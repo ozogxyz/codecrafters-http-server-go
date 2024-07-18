@@ -97,7 +97,7 @@ func HandleFileRequest(request *Request) *Response {
 		response.Header["Content-Type"] = "application/octet-stream"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(data))
 	} else if request.Method == "POST" {
-		f, err := os.Create(filepath.Join(dir, filename))
+		f, err := os.OpenFile(filepath.Join(dir, filename), os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			response.Status = "500 Internal Server Error"
 			return response
