@@ -72,11 +72,22 @@ func HandleRequest(request *Request) *Response {
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(response.Body))
 		return response
 	case strings.HasPrefix(url, "/files/"):
-		filename := strings.TrimPrefix(url, "/files/")
-		dir := os.Args[2]
+		response = HandleFileRequest(request)
+		return response
+	default:
+		response.Status = "404 Not Found"
+		return response
+	}
+}
+
+func HandleFileRequest(request *Request) *Response {
+	response := new(Response)
+	response.Header = make(map[string]string)
+	filename := strings.TrimPrefix(request.URL, "/files/")
+	dir := os.Args[2]
+	if request.Method == "GET" {
 		data, err := os.ReadFile(filepath.Join(dir, filename))
 		if err != nil {
-			fmt.Println("Error reading file", err.Error())
 			response.Status = "404 Not Found"
 			return response
 		}
@@ -84,11 +95,17 @@ func HandleRequest(request *Request) *Response {
 		response.Body = data
 		response.Header["Content-Type"] = "application/octet-stream"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(data))
-		return response
-	default:
-		response.Status = "404 Not Found"
-		return response
+	} else if request.Method == "POST" {
+		err := os.WriteFile(filepath.Join(dir, filename), request.Body, 0644)
+		if err != nil {
+			response.Status = "500 Internal Server Error"
+			return response
+		}
+		response.Status = "201 Created"
+		response.Header["Content-Type"] = "application/octet-stream"
+		response.Header["Content-Length"] = fmt.Sprintf("%d", len(request.Body))
 	}
+	return response
 }
 
 // Create a function to handle the connection
