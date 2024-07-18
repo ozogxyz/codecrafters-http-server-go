@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -71,8 +72,9 @@ func HandleRequest(request *Request) *Response {
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(response.Body))
 		return response
 	case strings.HasPrefix(url, "/files/"):
-		filename := strings.Split(url, "/files/")[1]
-		data, err := os.ReadFile("/tmp/" + filename)
+		filename := strings.TrimPrefix(url, "/files/")
+		dir := os.Args[2]
+		data, err := os.ReadFile(filepath.Join(dir, filename))
 		if err != nil {
 			fmt.Println("Error reading file", err.Error())
 			response.Status = "404 Not Found"
