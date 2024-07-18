@@ -111,12 +111,12 @@ func HandleFileRequest(request *Request) *Response {
 
 // Create a function to handle the connection
 func HandleConnection(conn net.Conn) {
-	var buf []byte = make([]byte, 2048)
+	var buf []byte = make([]byte, 8192)
 	n, err := conn.Read(buf)
 	if err != nil {
 		fmt.Println("Error reading from connection", err.Error())
 	}
-	if n > 2048 {
+	if n > 8192 {
 		fmt.Println("Buffer overflow")
 		os.Exit(1)
 	}
