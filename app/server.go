@@ -30,7 +30,7 @@ func handleConnection(conn net.Conn) {
 	}
 
 	if strings.Contains(url, "echo") {
-		response := fmt.Sprintf("%sContent-Type: text/plain\r\nContent-Length: %d\r\n\r%s", OK, len(url), url)
+		response := fmt.Sprintf("%sContent-Type: text/plain\r\nContent-Length: %d\r\n\r\n%s", OK, len(url), url)
 		conn.Write([]byte(response))
 		return
 	}
