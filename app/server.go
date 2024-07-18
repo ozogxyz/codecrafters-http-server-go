@@ -9,7 +9,7 @@ import (
 
 const (
 	NOT_FOUND = "HTTP/1.1 404 Not Found\r\n\r\n"
-	OK        = "HTTP/1.1 200 OK\r\n\r\n"
+	OK        = "HTTP/1.1 200 OK\r\n"
 )
 
 func handleConnection(conn net.Conn) {
@@ -24,11 +24,17 @@ func handleConnection(conn net.Conn) {
 	}
 	url := strings.Fields(string(buf))[1]
 	if url == "/" {
-		conn.Write([]byte(OK))
-	} else {
-		conn.Write([]byte(NOT_FOUND))
+		response := fmt.Sprintf("%s\r\n", OK)
+		conn.Write([]byte(response))
+		return
 	}
-	conn.Close()
+
+	if strings.Contains(url, "echo") {
+		response := fmt.Sprintf("%s\r\nContent-Type: text/plain\r\nContent-Length: %d\r\n\r%s", OK, len(url), url)
+		conn.Write([]byte(response))
+		return
+	}
+	conn.Write([]byte(NOT_FOUND))
 }
 
 func main() {
@@ -44,6 +50,6 @@ func main() {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-
+	defer conn.Close()
 	handleConnection(conn)
 }
