@@ -102,6 +102,7 @@ func HandleFileRequest(request *Request) *Response {
 			return response
 		}
 		response.Status = "201 Created"
+		fmt.Println("Created file", filename)
 		response.Header["Content-Type"] = "application/octet-stream"
 		response.Header["Content-Length"] = fmt.Sprintf("%d", len(request.Body))
 	}
